@@ -32,6 +32,8 @@ export function createEditorConfig(initialContent?: string) {
     theme,
     onError,
     nodes: editorNodes,
-    editorState: initialContent,
+    // An empty string is not a valid serialized state; let Lexical start blank.
+    editorState:
+      initialContent && initialContent.length > 0 ? initialContent : undefined,
   };
 }

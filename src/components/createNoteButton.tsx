@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Button,
   Modal,
@@ -13,7 +13,7 @@ import {
   SelectItem,
   useDisclosure,
 } from '@heroui/react';
-import { PlusIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { PlusIcon } from '@heroicons/react/24/outline';
 import { useNotes } from '@/contexts/notesContext';
 
 
@@ -26,15 +26,19 @@ export default function CreateNoteButton({
   variant = 'button',
   defaultFolderId = null,
 }: CreateNoteButtonProps) {
-  const { createNote, } = useNotes();
+  const { createNote, folders } = useNotes();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [noteTitle, setNoteTitle] = useState('');
+  const [folderId, setFolderId] = useState<string | null>(defaultFolderId);
 
+  useEffect(() => {
+    if (isOpen) setFolderId(defaultFolderId);
+  }, [isOpen, defaultFolderId]);
 
   const handleCreate = () => {
     if (!noteTitle.trim()) return;
-    
-    createNote(noteTitle);
+
+    createNote(noteTitle, folderId);
     setNoteTitle('');
 
     onClose();
@@ -109,8 +113,24 @@ export default function CreateNoteButton({
               onChange={(e) => setNoteTitle(e.target.value)}
               onKeyDown={handleKeyDown}
             />
-            
-            
+
+            {folders.length > 0 && (
+              <Select
+                label="Collection"
+                placeholder="No collection"
+                size="sm"
+                labelPlacement="outside"
+                selectedKeys={folderId ? [folderId] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string | undefined;
+                  setFolderId(selected ?? null);
+                }}
+              >
+                {folders.map((folder) => (
+                  <SelectItem key={folder.id}>{folder.name}</SelectItem>
+                ))}
+              </Select>
+            )}
           </ModalBody>
           <ModalFooter>
             <Button variant="light" onPress={onClose} size="sm">

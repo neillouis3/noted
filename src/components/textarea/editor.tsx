@@ -1,6 +1,9 @@
 'use client';
 
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import type { EditorState } from 'lexical';
+import { useRef } from 'react';
 import type { EditorProps } from '@/types/editor.types';
 import { createEditorConfig } from './config/editorConfig';
 import ToolbarPlugin from './plugins/toolbarPlugin';
@@ -15,6 +18,17 @@ export default function LexicalTextarea({
   className = '',
 }: EditorProps) {
   const initialConfig = createEditorConfig(initialContent);
+  // Skip the very first onChange that fires when the editor mounts, so opening
+  // a note doesn't immediately mark it as edited.
+  const isFirstChange = useRef(true);
+
+  const handleChange = (editorState: EditorState) => {
+    if (isFirstChange.current) {
+      isFirstChange.current = false;
+      return;
+    }
+    onChange?.(JSON.stringify(editorState.toJSON()));
+  };
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
@@ -22,6 +36,9 @@ export default function LexicalTextarea({
         <ToolbarPlugin />
         <EditorContent placeholder={placeholder} />
         <EditorPlugins autoFocus={autoFocus} />
+        {onChange && (
+          <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
+        )}
       </div>
     </LexicalComposer>
   );
