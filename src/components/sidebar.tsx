@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Key, ReactElement } from "react";
+import type { Key } from "react";
 import {
   Image,
   Input,
@@ -320,26 +320,8 @@ function NoteRow({
     else if (action.startsWith("move:")) onMove(action.slice(5));
   };
 
-  const moveItems = [
-    note.folderId !== null ? (
-      <DropdownItem
-        key="move:none"
-        startContent={<DocumentTextIcon className="h-4 w-4" />}
-      >
-        Remove from collection
-      </DropdownItem>
-    ) : null,
-    ...folders
-      .filter((f) => f.id !== note.folderId)
-      .map((f) => (
-        <DropdownItem
-          key={`move:${f.id}`}
-          startContent={<FolderIcon className="h-4 w-4" />}
-        >
-          {f.name}
-        </DropdownItem>
-      )),
-  ].filter(Boolean) as ReactElement[];
+  const moveTargets = folders.filter((f) => f.id !== note.folderId);
+  const showMoveSection = note.folderId !== null || moveTargets.length > 0;
 
   return (
     <div
@@ -375,9 +357,24 @@ function NoteRow({
             </DropdownItem>
           </DropdownSection>
 
-          {moveItems.length > 0 ? (
+          {showMoveSection ? (
             <DropdownSection showDivider title="Move to collection">
-              {moveItems}
+              {note.folderId !== null ? (
+                <DropdownItem
+                  key="move:none"
+                  startContent={<DocumentTextIcon className="h-4 w-4" />}
+                >
+                  Remove from collection
+                </DropdownItem>
+              ) : null}
+              {moveTargets.map((f) => (
+                <DropdownItem
+                  key={`move:${f.id}`}
+                  startContent={<FolderIcon className="h-4 w-4" />}
+                >
+                  {f.name}
+                </DropdownItem>
+              ))}
             </DropdownSection>
           ) : null}
 
