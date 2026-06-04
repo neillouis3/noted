@@ -18,6 +18,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Noted",
   description: "Built and designed by Neil Louise",
+  icons: {
+    icon: "/fav.ico",
+    shortcut: "/fav.ico",
+  },
 };
 
 export default function RootLayout({
