@@ -17,11 +17,11 @@ export default function EditorContent({
   );
 
   return (
-    <div className="relative pt-12">
+    <div className="relative pt-12 min-h-[calc(100vh-5rem)]">
       <RichTextPlugin
         contentEditable={
           <ContentEditable
-            className="flex-1 overflow-auto px-4 py-4 outline-none resize-none text-sm "
+            className="min-h-[calc(100vh-5rem)] px-4 py-4 outline-none resize-none text-sm"
             aria-placeholder={placeholder}
             placeholder={placeholderElement}
           />
