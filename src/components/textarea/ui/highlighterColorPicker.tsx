@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon } from '@hugeicons/core-free-icons';
+import Icon from '@/components/icon';
 import { HIGHLIGHT_COLORS, type HighlightColor, applyHighlightColor } from '../plugins/highlightPlugin';
 import type { LexicalEditor } from 'lexical';
 
@@ -47,7 +48,7 @@ export default function HighlightColorPicker({ editor, isActive }: HighlightColo
         aria-label="Highlight Color"
       >
         <div className={`w-4 h-4 rounded border border-default-300 ${HIGHLIGHT_COLORS[selectedColor]}`} />
-        <ChevronDownIcon className="w-3 h-3" />
+        <Icon icon={ChevronDownIcon} size={12} />
       </button>
 
       {showPicker && (

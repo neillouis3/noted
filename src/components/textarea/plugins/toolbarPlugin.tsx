@@ -1,25 +1,25 @@
 'use client';
 
 import {
-  BoldIcon,
-  ItalicIcon,
-  UnderlineIcon,
-  StrikethroughIcon,
-  CodeBracketIcon,
-  Bars3BottomLeftIcon,
-  Bars3Icon,
-  Bars3BottomRightIcon,
-  Bars4Icon,
-  ListBulletIcon,
-  NumberedListIcon,
-  PaperClipIcon,
-  H1Icon,
-  H2Icon,
-  H3Icon,
-  ArrowUturnLeftIcon,
-  ArrowUturnRightIcon,
-  PhotoIcon,
-} from '@heroicons/react/24/outline';
+  UndoIcon,
+  RedoIcon,
+  TextBoldIcon,
+  TextItalicIcon,
+  TextUnderlineIcon,
+  TextStrikethroughIcon,
+  SourceCodeIcon,
+  TextAlignLeftIcon,
+  TextAlignCenterIcon,
+  TextAlignRightIcon,
+  TextAlignJustifyCenterIcon,
+  LeftToRightListBulletIcon,
+  LeftToRightListNumberIcon,
+  QuoteDownIcon,
+  Heading01Icon,
+  Heading02Icon,
+  Heading03Icon,
+  Image01Icon,
+} from '@hugeicons/core-free-icons';
 import { useState } from 'react';
 import ToolbarButton from '../ui/toolbarButton';
 import ToolbarDivider from '../ui/toolbarDivider';
@@ -56,12 +56,12 @@ export default function ToolbarPlugin() {
       <div className=" backdrop-blur-lg flex flex-wrap items-center gap-1 border border-default-200 w-fit p-1 rounded-lg ml-80 mt-4 fixed top-0 left-0 z-10">
         <ToolbarButton
           onClick={() => undoCommand(editor)}
-          icon={ArrowUturnLeftIcon}
+          icon={UndoIcon}
           label="Undo"
         />
         <ToolbarButton
           onClick={() => redoCommand(editor)}
-          icon={ArrowUturnRightIcon}
+          icon={RedoIcon}
           label="Redo"
         />
 
@@ -70,31 +70,31 @@ export default function ToolbarPlugin() {
         <ToolbarButton
           onClick={() => formatText(editor, 'bold')}
           isActive={isBold}
-          icon={BoldIcon}
+          icon={TextBoldIcon}
           label="Bold"
         />
         <ToolbarButton
           onClick={() => formatText(editor, 'italic')}
           isActive={isItalic}
-          icon={ItalicIcon}
+          icon={TextItalicIcon}
           label="Italic"
         />
         <ToolbarButton
           onClick={() => formatText(editor, 'underline')}
           isActive={isUnderline}
-          icon={UnderlineIcon}
+          icon={TextUnderlineIcon}
           label="Underline"
         />
         <ToolbarButton
           onClick={() => formatText(editor, 'strikethrough')}
           isActive={isStrikethrough}
-          icon={StrikethroughIcon}
+          icon={TextStrikethroughIcon}
           label="Strikethrough"
         />
         <ToolbarButton
           onClick={() => formatText(editor, 'code')}
           isActive={isCode}
-          icon={CodeBracketIcon}
+          icon={SourceCodeIcon}
           label="Code"
         />
         
@@ -105,19 +105,19 @@ export default function ToolbarPlugin() {
         <ToolbarButton
           onClick={() => formatHeading(editor, 'h1', blockType)}
           isActive={blockType === 'h1'}
-          icon={H1Icon}
+          icon={Heading01Icon}
           label="Heading 1"
         />
         <ToolbarButton
           onClick={() => formatHeading(editor, 'h2', blockType)}
           isActive={blockType === 'h2'}
-          icon={H2Icon}
+          icon={Heading02Icon}
           label="Heading 2"
         />
         <ToolbarButton
           onClick={() => formatHeading(editor, 'h3', blockType)}
           isActive={blockType === 'h3'}
-          icon={H3Icon}
+          icon={Heading03Icon}
           label="Heading 3"
         />
 
@@ -126,19 +126,19 @@ export default function ToolbarPlugin() {
         <ToolbarButton
           onClick={() => formatBulletList(editor, blockType)}
           isActive={blockType === 'bullet'}
-          icon={ListBulletIcon}
+          icon={LeftToRightListBulletIcon}
           label="Bullet List"
         />
         <ToolbarButton
           onClick={() => formatNumberedList(editor, blockType)}
           isActive={blockType === 'number'}
-          icon={NumberedListIcon}
+          icon={LeftToRightListNumberIcon}
           label="Numbered List"
         />
         <ToolbarButton
           onClick={() => formatQuote(editor, blockType)}
           isActive={blockType === 'quote'}
-          icon={PaperClipIcon}
+          icon={QuoteDownIcon}
           label="Quote"
         />
 
@@ -146,7 +146,7 @@ export default function ToolbarPlugin() {
 
         <ToolbarButton
           onClick={() => setShowImageDialog(true)}
-          icon={PhotoIcon}
+          icon={Image01Icon}
           label="Insert Image"
         />
 
@@ -154,22 +154,22 @@ export default function ToolbarPlugin() {
 
         <ToolbarButton
           onClick={() => formatAlignment(editor, 'left')}
-          icon={Bars3BottomLeftIcon}
+          icon={TextAlignLeftIcon}
           label="Align Left"
         />
         <ToolbarButton
           onClick={() => formatAlignment(editor, 'center')}
-          icon={Bars3Icon}
+          icon={TextAlignCenterIcon}
           label="Align Center"
         />
         <ToolbarButton
           onClick={() => formatAlignment(editor, 'right')}
-          icon={Bars3BottomRightIcon}
+          icon={TextAlignRightIcon}
           label="Align Right"
         />
         <ToolbarButton
           onClick={() => formatAlignment(editor, 'justify')}
-          icon={Bars4Icon}
+          icon={TextAlignJustifyCenterIcon}
           label="Align Justify"
         />
       </div>

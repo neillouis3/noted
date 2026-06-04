@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback } from 'react';
-import { DocumentTextIcon } from '@heroicons/react/24/outline';
+import { Note01Icon } from '@hugeicons/core-free-icons';
+import Icon from '@/components/icon';
 import LexicalTextarea from '@/components/textarea/editor';
 import { useNotes } from '@/contexts/notesContext';
 
@@ -21,7 +22,7 @@ export default function EditorArea() {
   if (!note) {
     return (
       <div className="flex flex-col items-center justify-center h-screen text-default-400">
-        <DocumentTextIcon className="h-16 w-16 mb-4 opacity-40" />
+        <Icon icon={Note01Icon} size={64} className="mb-4 opacity-40" />
         <p className="text-sm">Select a note or create a new one to start writing.</p>
       </div>
     );

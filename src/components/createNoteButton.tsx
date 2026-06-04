@@ -13,7 +13,8 @@ import {
   SelectItem,
   useDisclosure,
 } from '@heroui/react';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import { Add01Icon } from '@hugeicons/core-free-icons';
+import Icon from '@/components/icon';
 import { useNotes } from '@/contexts/notesContext';
 
 
@@ -62,7 +63,7 @@ export default function CreateNoteButton({
             aria-label="Create note"
             size="sm"
           >
-            <PlusIcon className="h-5 w-5" />
+            <Icon icon={Add01Icon} size={16} />
           </Button>
         );
       case 'fab':
@@ -72,7 +73,7 @@ export default function CreateNoteButton({
             onPress={onOpen}
             className="fixed bottom-6 right-6 z-50 shadow-lg"
             size="sm"
-            startContent={<PlusIcon className="h-5 w-5" />}
+            startContent={<Icon icon={Add01Icon} size={16} />}
           >
             New Note
           </Button>
@@ -82,7 +83,7 @@ export default function CreateNoteButton({
           <Button
             color="primary"
             onPress={onOpen}
-            startContent={<PlusIcon className="h-5 w-5" />}
+            startContent={<Icon icon={Add01Icon} size={16} />}
             size="sm"
           >
             New Note

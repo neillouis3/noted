@@ -9,7 +9,8 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@heroui/react';
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { Delete02Icon } from '@hugeicons/core-free-icons';
+import Icon from '@/components/icon';
 import { useNotes } from '@/contexts/notesContext';
 
 interface DeleteNoteButtonProps {
@@ -78,7 +79,7 @@ export default function DeleteNoteButton({
           onPress={onOpen}
           aria-label="Delete note"
         >
-          <TrashIcon className="h-4 w-4" />
+          <Icon icon={Delete02Icon} size={16} />
         </Button>
       );
     }
@@ -88,7 +89,7 @@ export default function DeleteNoteButton({
         color="danger"
         variant="light"
         onPress={onOpen}
-        startContent={<TrashIcon className="h-4 w-4" />}
+        startContent={<Icon icon={Delete02Icon} size={16} />}
       >
         Delete
       </Button>

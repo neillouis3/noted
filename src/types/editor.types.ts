@@ -6,10 +6,12 @@ export interface EditorProps {
     className?: string;
   }
   
+import type { IconSvgElement } from '@hugeicons/react';
+
   export interface ToolbarButtonProps {
     onClick: () => void;
     isActive?: boolean;
-    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+    icon: IconSvgElement;
     label: string;
   }
   

@@ -2,11 +2,12 @@
 
 import { Button } from '@heroui/react';
 import type { ToolbarButtonProps } from '@/types/editor.types';
+import Icon from '@/components/icon';
 
 export default function ToolbarButton({ 
   onClick, 
   isActive = false, 
-  icon: Icon, 
+  icon, 
   label 
 }: ToolbarButtonProps) {
   return (
@@ -19,7 +20,7 @@ export default function ToolbarButton({
       aria-label={label}
       
     >
-      <Icon className="w-4 h-4"/>
+      <Icon icon={icon} size={16} />
     </Button>
   );
 }
