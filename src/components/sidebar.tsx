@@ -322,6 +322,16 @@ function NoteRow({
 
   const moveTargets = folders.filter((f) => f.id !== note.folderId);
   const showMoveSection = note.folderId !== null || moveTargets.length > 0;
+  const moveMenuItems = [
+    ...(note.folderId !== null
+      ? [{ key: "move:none", label: "Remove from collection", kind: "remove" as const }]
+      : []),
+    ...moveTargets.map((f) => ({
+      key: `move:${f.id}`,
+      label: f.name,
+      kind: "folder" as const,
+    })),
+  ];
 
   return (
     <div
@@ -358,23 +368,25 @@ function NoteRow({
           </DropdownSection>
 
           {showMoveSection ? (
-            <DropdownSection showDivider title="Move to collection">
-              {note.folderId !== null ? (
+            <DropdownSection
+              showDivider
+              title="Move to collection"
+              items={moveMenuItems}
+            >
+              {(item) => (
                 <DropdownItem
-                  key="move:none"
-                  startContent={<DocumentTextIcon className="h-4 w-4" />}
+                  key={item.key}
+                  startContent={
+                    item.kind === "remove" ? (
+                      <DocumentTextIcon className="h-4 w-4" />
+                    ) : (
+                      <FolderIcon className="h-4 w-4" />
+                    )
+                  }
                 >
-                  Remove from collection
+                  {item.label}
                 </DropdownItem>
-              ) : null}
-              {moveTargets.map((f) => (
-                <DropdownItem
-                  key={`move:${f.id}`}
-                  startContent={<FolderIcon className="h-4 w-4" />}
-                >
-                  {f.name}
-                </DropdownItem>
-              ))}
+              )}
             </DropdownSection>
           ) : null}
 
