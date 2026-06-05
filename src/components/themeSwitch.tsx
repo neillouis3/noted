@@ -1,50 +1,37 @@
 "use client";
 
+import { Switch } from "@heroui/react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import React from "react";
-import { VisuallyHidden, useSwitch } from "@heroui/react";
 
-const ThemeSwitch: React.FC<{ isSelected: boolean }> = (props) => {
-  const {
-    Component,
-    slots,
-    isSelected,
-    getBaseProps,
-    getInputProps,
-    getWrapperProps,
-  } = useSwitch(props);
+export function ThemeSwitcher() {
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
 
-  const { setTheme } = useTheme();
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const handleChange = () => {
-    setTheme(isSelected ? "light" : "dark");
-  };
+  if (!mounted) return null;
+
+  const isDark = theme === "dark";
 
   return (
-    <div className="text-black border border-default-200 rounded-lg p-1 z-10  backdrop-blur-lg">
-      <Component {...getBaseProps()} onClick={handleChange}>
-        <VisuallyHidden>
-          <input {...getInputProps()} />
-        </VisuallyHidden>
-        <div
-          {...getWrapperProps()}
-          className={slots.wrapper({
-            class: [
-              "w-8 h-8",
-              "flex items-center justify-center",
-              "rounded-lg bg-background hover:bg-default-200/50",
-            ],
-          })}
-        >
-          {isSelected ? (
+    <div className="text-foreground border border-border rounded-lg p-1 z-10 backdrop-blur-lg">
+      <Switch
+        isSelected={isDark}
+        onChange={(selected) => setTheme(selected ? "dark" : "light")}
+        aria-label="Toggle theme"
+      >
+        <Switch.Control className="w-8 h-8 flex items-center justify-center rounded-lg bg-background hover:bg-surface-secondary">
+          {isDark ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               width={20}
               height={20}
-              color={"var(--foreground)"}
-              fill={"none"}
+              fill="none"
             >
               <path
                 d="M21.5 14.0784C20.3003 14.7189 18.9301 15.0821 17.4751 15.0821C12.7491 15.0821 8.91792 11.2509 8.91792 6.52485C8.91792 5.06986 9.28105 3.69968 9.92163 2.5C5.66765 3.49698 2.5 7.31513 2.5 11.8731C2.5 17.1899 6.8101 21.5 12.1269 21.5C16.6849 21.5 20.503 18.3324 21.5 14.0784Z"
@@ -60,8 +47,7 @@ const ThemeSwitch: React.FC<{ isSelected: boolean }> = (props) => {
               viewBox="0 0 24 24"
               width={20}
               height={20}
-              color={"#000000"}
-              fill={"none"}
+              fill="none"
             >
               <path
                 d="M17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12C7 9.23858 9.23858 7 12 7C14.7614 7 17 9.23858 17 12Z"
@@ -77,25 +63,8 @@ const ThemeSwitch: React.FC<{ isSelected: boolean }> = (props) => {
               />
             </svg>
           )}
-        </div>
-      </Component>
-    </div>
-  );
-};
-
-export function ThemeSwitcher() {
-  const [mounted, setMounted] = useState(false);
-  const { theme } = useTheme();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
-  return (
-    <div className="text-black">
-      <ThemeSwitch isSelected={theme === "dark"} />
+        </Switch.Control>
+      </Switch>
     </div>
   );
 }

@@ -3,20 +3,16 @@
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import {
-  Image,
-  Input,
   Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-  useDisclosure,
+  Header,
+  Input,
+  InputGroup,
+  Label,
+  Modal,
+  Separator,
+  TextField,
+  useOverlayState,
 } from "@heroui/react";
 import {
   Search01Icon,
@@ -37,7 +33,7 @@ import { downloadNoteAsTxt, printNote } from "@/utils/noteExport";
 import CreateNoteButton from "./createNoteButton";
 import Icon from "./icon";
 
-const sidebarIconClass = "shrink-0 text-default-500";
+const sidebarIconClass = "shrink-0 text-muted";
 
 export default function Sidebar() {
   const {
@@ -54,15 +50,13 @@ export default function Sidebar() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-
-  const collectionModal = useDisclosure();
+  const collectionModal = useOverlayState();
   const [collectionName, setCollectionName] = useState("");
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
 
   const query = searchQuery.toLowerCase();
   const filteredNotes = useMemo(
-    () =>
-      notes.filter((note) => note.title.toLowerCase().includes(query)),
+    () => notes.filter((note) => note.title.toLowerCase().includes(query)),
     [notes, query]
   );
 
@@ -74,13 +68,13 @@ export default function Sidebar() {
   const openCreateCollection = () => {
     setEditingFolderId(null);
     setCollectionName("");
-    collectionModal.onOpen();
+    collectionModal.open();
   };
 
   const openRenameCollection = (id: string, currentName: string) => {
     setEditingFolderId(id);
     setCollectionName(currentName);
-    collectionModal.onOpen();
+    collectionModal.open();
   };
 
   const handleCollectionSubmit = () => {
@@ -93,7 +87,7 @@ export default function Sidebar() {
     }
     setCollectionName("");
     setEditingFolderId(null);
-    collectionModal.onClose();
+    collectionModal.close();
   };
 
   const noteRow = (note: Note) => (
@@ -111,58 +105,50 @@ export default function Sidebar() {
   );
 
   return (
-    <div className="w-72 bg-background text-foreground flex flex-col h-[calc(100vh-2rem)] border border-default-200 rounded-lg p-4 fixed top-0 left-0 z-10 ml-4 mt-4 ">
+    <div className="w-72 bg-background text-foreground flex flex-col h-[calc(100vh-2rem)] border border-border rounded-lg p-4 fixed top-0 left-0 z-10 ml-4 mt-4">
       <div className="flex flex-row gap-4 items-center mb-4">
-        <Image
-          src="/logo.png"
-          alt="Navigate"
-          width={48}
-          height={48}
-          className="rounded-lg"
-        />
+        <img src="/logo.png" alt="Noted" width={48} height={48} className="rounded-lg" />
         <h1 className="text-sm font-semibold">Noted</h1>
       </div>
 
       <div className="mb-4">
-        <Input
-          placeholder="Search notes..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          startContent={<Icon icon={Search01Icon} className={sidebarIconClass} />}
-          className="w-full"
-          size="sm"
-        />
+        <TextField className="w-full">
+          <InputGroup>
+            <InputGroup.Prefix>
+              <Icon icon={Search01Icon} className={sidebarIconClass} />
+            </InputGroup.Prefix>
+            <Input
+              placeholder="Search notes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </InputGroup>
+        </TextField>
       </div>
 
       <div className="mb-4 flex items-center gap-2">
         <CreateNoteButton />
-        <Button
-          variant="flat"
-          size="sm"
-          onPress={openCreateCollection}
-          startContent={<Icon icon={FolderAddIcon} className={sidebarIconClass} />}
-        >
+        <Button variant="tertiary" size="sm" onPress={openCreateCollection}>
+          <Icon icon={FolderAddIcon} className={sidebarIconClass} />
           Collection
         </Button>
       </div>
 
       <div className="flex-1 overflow-y-auto -mr-2 pr-2 text-sm">
         {notes.length === 0 && folders.length === 0 ? (
-          <div className="text-center py-8 text-default-400">
+          <div className="text-center py-8 text-muted">
             <Icon icon={Note01Icon} size={48} className="mx-auto mb-2 opacity-50" />
             <p>No notes yet</p>
-            <p className="text-default-400 mt-1">Click &quot;New Note&quot; to get started</p>
+            <p className="text-muted mt-1">Click &quot;New Note&quot; to get started</p>
           </div>
         ) : (
           <div className="flex flex-col gap-1">
             {folders.map((folder) => {
-              const folderNotes = filteredNotes.filter(
-                (n) => n.folderId === folder.id
-              );
+              const folderNotes = filteredNotes.filter((n) => n.folderId === folder.id);
               const isOpen = expanded[folder.id] ?? false;
               return (
                 <div key={folder.id}>
-                  <div className="group flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-default-100">
+                  <div className="group flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-surface-secondary">
                     <button
                       className="flex items-center gap-1.5 flex-1 min-w-0 text-left text-sm"
                       onClick={() => toggleFolder(folder.id)}
@@ -173,43 +159,32 @@ export default function Sidebar() {
                       />
                       <Icon icon={Folder01Icon} className={sidebarIconClass} />
                       <span className="truncate">{folder.name}</span>
-                      <span className="text-default-400 shrink-0">
-                        {folderNotes.length}
-                      </span>
+                      <span className="text-muted shrink-0">{folderNotes.length}</span>
                     </button>
-                    <Dropdown placement="bottom-end">
-                      <DropdownTrigger>
-                        <button className="p-1 hover:bg-default-200 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Dropdown>
+                      <Dropdown.Trigger>
+                        <button className="p-1 hover:bg-surface-tertiary rounded opacity-0 group-hover:opacity-100 transition-opacity">
                           <Icon icon={MoreVerticalIcon} className={sidebarIconClass} />
                         </button>
-                      </DropdownTrigger>
-                      <DropdownMenu
-                        aria-label="Collection actions"
-                        onAction={(key) => {
-                          if (key === "rename")
-                            openRenameCollection(folder.id, folder.name);
-                          if (key === "delete") deleteFolder(folder.id);
-                        }}
-                      >
-                        <DropdownItem
-                          key="rename"
-                          startContent={
+                      </Dropdown.Trigger>
+                      <Dropdown.Popover placement="bottom end">
+                        <Dropdown.Menu
+                          aria-label="Collection actions"
+                          onAction={(key) => {
+                            if (key === "rename") openRenameCollection(folder.id, folder.name);
+                            if (key === "delete") deleteFolder(folder.id);
+                          }}
+                        >
+                          <Dropdown.Item id="rename" textValue="Rename">
                             <Icon icon={PencilEdit01Icon} className={sidebarIconClass} />
-                          }
-                        >
-                          Rename
-                        </DropdownItem>
-                        <DropdownItem
-                          key="delete"
-                          className="text-danger"
-                          color="danger"
-                          startContent={
+                            <Label>Rename</Label>
+                          </Dropdown.Item>
+                          <Dropdown.Item id="delete" textValue="Delete collection" variant="danger">
                             <Icon icon={Delete02Icon} className={sidebarIconClass} />
-                          }
-                        >
-                          Delete collection
-                        </DropdownItem>
-                      </DropdownMenu>
+                            <Label>Delete collection</Label>
+                          </Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown.Popover>
                     </Dropdown>
                   </div>
 
@@ -218,9 +193,7 @@ export default function Sidebar() {
                       {folderNotes.length > 0 ? (
                         folderNotes.map(noteRow)
                       ) : (
-                        <p className="text-default-400 px-3 py-1.5">
-                          Empty collection
-                        </p>
+                        <p className="text-muted px-3 py-1.5">Empty collection</p>
                       )}
                     </div>
                   )}
@@ -231,54 +204,61 @@ export default function Sidebar() {
             {ungroupedNotes.length > 0 && (
               <div className="mt-1 flex flex-col gap-0.5">
                 {folders.length > 0 && (
-                  <p className="text-default-400 px-2 pt-2 pb-1">Notes</p>
+                  <p className="text-muted px-2 pt-2 pb-1">Notes</p>
                 )}
                 {ungroupedNotes.map(noteRow)}
               </div>
             )}
 
             {filteredNotes.length === 0 && searchQuery && (
-              <p className="text-center text-default-400 py-4">
-                No notes found
-              </p>
+              <p className="text-center text-muted py-4">No notes found</p>
             )}
           </div>
         )}
       </div>
 
-      <Modal isOpen={collectionModal.isOpen} onClose={collectionModal.onClose}>
-        <ModalContent>
-          <ModalHeader className="text-md font-normal">
-            {editingFolderId ? "Rename Collection" : "New Collection"}
-          </ModalHeader>
-          <ModalBody>
-            <Input
-              autoFocus
-              label="Collection Name"
-              placeholder="Enter collection name..."
-              value={collectionName}
-              size="sm"
-              labelPlacement="outside"
-              onChange={(e) => setCollectionName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleCollectionSubmit();
-              }}
-            />
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="light" size="sm" onPress={collectionModal.onClose}>
-              Cancel
-            </Button>
-            <Button
-              color="primary"
-              size="sm"
-              onPress={handleCollectionSubmit}
-              isDisabled={!collectionName.trim()}
-            >
-              {editingFolderId ? "Save" : "Create"}
-            </Button>
-          </ModalFooter>
-        </ModalContent>
+      <Modal state={collectionModal}>
+        <Modal.Backdrop
+          isOpen={collectionModal.isOpen}
+          onOpenChange={collectionModal.setOpen}
+        >
+          <Modal.Container>
+            <Modal.Dialog className="sm:max-w-md">
+              <Modal.Header>
+                <Modal.Heading className="text-md font-normal">
+                  {editingFolderId ? "Rename Collection" : "New Collection"}
+                </Modal.Heading>
+              </Modal.Header>
+              <Modal.Body>
+                <TextField className="w-full">
+                  <Label className="text-sm">Collection Name</Label>
+                  <Input
+                    autoFocus
+                    placeholder="Enter collection name..."
+                    value={collectionName}
+                    onChange={(e) => setCollectionName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleCollectionSubmit();
+                    }}
+                  />
+                </TextField>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="tertiary" size="sm" onPress={collectionModal.close}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onPress={handleCollectionSubmit}
+                  isDisabled={!collectionName.trim()}
+                >
+                  {editingFolderId ? "Save" : "Create"}
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
     </div>
   );
@@ -330,72 +310,62 @@ function NoteRow({
   return (
     <div
       className={`group flex items-center gap-1.5 px-2 py-1.5 rounded-md cursor-pointer transition-colors text-sm ${
-        isSelected ? "bg-default-200" : "hover:bg-default-100"
+        isSelected ? "bg-surface-tertiary" : "hover:bg-surface-secondary"
       }`}
       onClick={onSelect}
     >
       <Icon icon={Note01Icon} className={sidebarIconClass} />
       <span className="truncate flex-1 min-w-0">{note.title}</span>
-      <Dropdown placement="bottom-end">
-        <DropdownTrigger>
+      <Dropdown>
+        <Dropdown.Trigger>
           <button
-            className="p-1 hover:bg-default-200 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+            className="p-1 hover:bg-surface-tertiary rounded opacity-0 group-hover:opacity-100 transition-opacity"
             onClick={(e) => e.stopPropagation()}
           >
             <Icon icon={MoreVerticalIcon} className={sidebarIconClass} />
           </button>
-        </DropdownTrigger>
-        <DropdownMenu aria-label="Note actions" onAction={handleAction}>
-          <DropdownSection showDivider title="Export">
-            <DropdownItem
-              key="download"
-              startContent={
+        </Dropdown.Trigger>
+        <Dropdown.Popover placement="bottom end">
+          <Dropdown.Menu aria-label="Note actions" onAction={handleAction}>
+            <Dropdown.Section>
+              <Header>Export</Header>
+              <Dropdown.Item id="download" textValue="Download .txt">
                 <Icon icon={Download01Icon} className={sidebarIconClass} />
-              }
-            >
-              Download .txt
-            </DropdownItem>
-            <DropdownItem
-              key="print"
-              startContent={<Icon icon={PrinterIcon} className={sidebarIconClass} />}
-            >
-              Print
-            </DropdownItem>
-          </DropdownSection>
+                <Label>Download .txt</Label>
+              </Dropdown.Item>
+              <Dropdown.Item id="print" textValue="Print">
+                <Icon icon={PrinterIcon} className={sidebarIconClass} />
+                <Label>Print</Label>
+              </Dropdown.Item>
+            </Dropdown.Section>
 
-          {showMoveSection ? (
-            <DropdownSection
-              showDivider
-              title="Move to collection"
-              items={moveMenuItems}
-            >
-              {(item) => (
-                <DropdownItem
-                  key={item.key}
-                  startContent={
-                    <Icon
-                      icon={item.kind === "remove" ? Note01Icon : Folder01Icon}
-                      className={sidebarIconClass}
-                    />
-                  }
-                >
-                  {item.label}
-                </DropdownItem>
-              )}
-            </DropdownSection>
-          ) : null}
+            {showMoveSection ? (
+              <>
+                <Separator />
+                <Dropdown.Section>
+                  <Header>Move to collection</Header>
+                  {moveMenuItems.map((item) => (
+                    <Dropdown.Item key={item.key} id={item.key} textValue={item.label}>
+                      <Icon
+                        icon={item.kind === "remove" ? Note01Icon : Folder01Icon}
+                        className={sidebarIconClass}
+                      />
+                      <Label>{item.label}</Label>
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Section>
+              </>
+            ) : null}
 
-          <DropdownSection>
-            <DropdownItem
-              key="delete"
-              className="text-danger"
-              color="danger"
-              startContent={<Icon icon={Delete02Icon} className={sidebarIconClass} />}
-            >
-              Delete
-            </DropdownItem>
-          </DropdownSection>
-        </DropdownMenu>
+            <Separator />
+            <Dropdown.Section>
+              <Dropdown.Item id="delete" textValue="Delete" variant="danger">
+                <Icon icon={Delete02Icon} className={sidebarIconClass} />
+                <Label>Delete</Label>
+              </Dropdown.Item>
+            </Dropdown.Section>
+          </Dropdown.Menu>
+        </Dropdown.Popover>
       </Dropdown>
     </div>
   );

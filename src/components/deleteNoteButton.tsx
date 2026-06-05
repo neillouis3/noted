@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from '@heroui/react';
+import { Button, Modal, useOverlayState } from '@heroui/react';
 import { Delete02Icon } from '@hugeicons/core-free-icons';
 import Icon from '@/components/icon';
 import { useNotes } from '@/contexts/notesContext';
@@ -20,6 +12,44 @@ interface DeleteNoteButtonProps {
   onDeleted?: () => void;
 }
 
+function DeleteConfirmModal({
+  state,
+  displayName,
+  onConfirm,
+}: {
+  state: ReturnType<typeof useOverlayState>;
+  displayName: string;
+  onConfirm: () => void;
+}) {
+  return (
+    <Modal state={state}>
+      <Modal.Backdrop isOpen={state.isOpen} onOpenChange={state.setOpen}>
+        <Modal.Container>
+          <Modal.Dialog className="sm:max-w-md">
+            <Modal.Header>
+              <Modal.Heading>Delete Note</Modal.Heading>
+            </Modal.Header>
+            <Modal.Body>
+              <p>
+                Are you sure you want to delete <strong>{displayName}</strong>?
+              </p>
+              <p className="text-sm text-muted mt-2">This action cannot be undone.</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="tertiary" onPress={state.close}>
+                Cancel
+              </Button>
+              <Button variant="danger" onPress={onConfirm}>
+                Delete
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
+    </Modal>
+  );
+}
+
 export default function DeleteNoteButton({
   noteId,
   noteName,
@@ -27,56 +57,39 @@ export default function DeleteNoteButton({
   onDeleted,
 }: DeleteNoteButtonProps) {
   const { deleteNote, notes } = useNotes();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const modalState = useOverlayState();
 
   const note = notes.find((n) => n.id === noteId);
   const displayName = noteName || note?.title || 'this note';
 
   const handleDelete = () => {
     deleteNote(noteId);
-    onClose();
+    modalState.close();
     onDeleted?.();
   };
 
-  // For dropdown usage (no button, just trigger)
   if (variant === 'dropdown') {
     return (
       <>
-        <div onClick={onOpen} className="w-full">
+        <div onClick={modalState.open} className="w-full">
           Delete
         </div>
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalContent>
-            <ModalHeader>Delete Note</ModalHeader>
-            <ModalBody>
-              <p>
-                Are you sure you want to delete <strong>{displayName}</strong>?
-              </p>
-              <p className="text-sm text-default-500">This action cannot be undone.</p>
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="light" onPress={onClose}>
-                Cancel
-              </Button>
-              <Button color="danger" onPress={handleDelete}>
-                Delete
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <DeleteConfirmModal
+          state={modalState}
+          displayName={displayName}
+          onConfirm={handleDelete}
+        />
       </>
     );
   }
 
-  // Button variants
   const renderButton = () => {
     if (variant === 'icon') {
       return (
         <Button
           isIconOnly
-          color="danger"
-          variant="light"
-          onPress={onOpen}
+          variant="danger-soft"
+          onPress={modalState.open}
           aria-label="Delete note"
         >
           <Icon icon={Delete02Icon} size={16} />
@@ -85,12 +98,8 @@ export default function DeleteNoteButton({
     }
 
     return (
-      <Button
-        color="danger"
-        variant="light"
-        onPress={onOpen}
-        startContent={<Icon icon={Delete02Icon} size={16} />}
-      >
+      <Button variant="danger-soft" onPress={modalState.open}>
+        <Icon icon={Delete02Icon} size={16} />
         Delete
       </Button>
     );
@@ -99,26 +108,11 @@ export default function DeleteNoteButton({
   return (
     <>
       {renderButton()}
-
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalContent>
-          <ModalHeader>Delete Note</ModalHeader>
-          <ModalBody>
-            <p>
-              Are you sure you want to delete <strong>{displayName}</strong>?
-            </p>
-            <p className="text-sm text-default-500">This action cannot be undone.</p>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="light" onPress={onClose}>
-              Cancel
-            </Button>
-            <Button color="danger" onPress={handleDelete}>
-              Delete
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <DeleteConfirmModal
+        state={modalState}
+        displayName={displayName}
+        onConfirm={handleDelete}
+      />
     </>
   );
 }
