@@ -1,27 +1,25 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Key } from "react";
 import {
   Button,
   Dropdown,
   Header,
   Input,
-  InputGroup,
   Label,
   Modal,
+  SearchField,
   Separator,
+  Tabs,
   TextField,
   useOverlayState,
 } from "@heroui/react";
 import {
-  Search01Icon,
   Note01Icon,
   MoreVerticalIcon,
   Folder01Icon,
-  FolderAddIcon,
-  ChevronRightIcon,
-  ChevronDownIcon,
+  Add01Icon,
   Download01Icon,
   PrinterIcon,
   Delete02Icon,
@@ -34,6 +32,7 @@ import CreateNoteButton from "./createNoteButton";
 import Icon from "./icon";
 
 const sidebarIconClass = "shrink-0 text-muted";
+const ALL_COLLECTIONS_ID = "all";
 
 export default function Sidebar() {
   const {
@@ -49,7 +48,7 @@ export default function Sidebar() {
   } = useNotes();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string>(ALL_COLLECTIONS_ID);
   const collectionModal = useOverlayState();
   const [collectionName, setCollectionName] = useState("");
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
@@ -60,10 +59,34 @@ export default function Sidebar() {
     [notes, query]
   );
 
-  const ungroupedNotes = filteredNotes.filter((n) => n.folderId === null);
+  const displayedNotes = useMemo(() => {
+    if (folders.length === 0) {
+      return filteredNotes;
+    }
 
-  const toggleFolder = (id: string) =>
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+    if (selectedCollectionId === ALL_COLLECTIONS_ID) {
+      return filteredNotes.filter((note) => note.folderId === null);
+    }
+
+    return filteredNotes.filter((note) => note.folderId === selectedCollectionId);
+  }, [filteredNotes, folders.length, selectedCollectionId]);
+
+  const activeFolder =
+    selectedCollectionId !== ALL_COLLECTIONS_ID
+      ? folders.find((folder) => folder.id === selectedCollectionId) ?? null
+      : null;
+
+  const defaultFolderIdForNewNote =
+    activeFolder?.id ?? (selectedCollectionId === ALL_COLLECTIONS_ID ? null : selectedCollectionId);
+
+  useEffect(() => {
+    if (
+      selectedCollectionId !== ALL_COLLECTIONS_ID &&
+      !folders.some((folder) => folder.id === selectedCollectionId)
+    ) {
+      setSelectedCollectionId(ALL_COLLECTIONS_ID);
+    }
+  }, [folders, selectedCollectionId]);
 
   const openCreateCollection = () => {
     setEditingFolderId(null);
@@ -71,23 +94,32 @@ export default function Sidebar() {
     collectionModal.open();
   };
 
-  const openRenameCollection = (id: string, currentName: string) => {
-    setEditingFolderId(id);
-    setCollectionName(currentName);
+  const openRenameCollection = () => {
+    if (!activeFolder) return;
+    setEditingFolderId(activeFolder.id);
+    setCollectionName(activeFolder.name);
     collectionModal.open();
   };
 
   const handleCollectionSubmit = () => {
     if (!collectionName.trim()) return;
+
     if (editingFolderId) {
       renameFolder(editingFolderId, collectionName);
     } else {
       const folder = createFolder(collectionName);
-      setExpanded((prev) => ({ ...prev, [folder.id]: true }));
+      setSelectedCollectionId(folder.id);
     }
+
     setCollectionName("");
     setEditingFolderId(null);
     collectionModal.close();
+  };
+
+  const handleDeleteCollection = () => {
+    if (!activeFolder) return;
+    deleteFolder(activeFolder.id);
+    setSelectedCollectionId(ALL_COLLECTIONS_ID);
   };
 
   const noteRow = (note: Note) => (
@@ -107,108 +139,123 @@ export default function Sidebar() {
   return (
     <div className="w-72 bg-background text-foreground flex flex-col h-[calc(100vh-2rem)] border border-border rounded-lg p-4 fixed top-0 left-0 z-10 ml-4 mt-4">
       <div className="mb-4">
-        <TextField className="w-full">
-          <InputGroup>
-            <InputGroup.Prefix>
-              <Icon icon={Search01Icon} className={sidebarIconClass} />
-            </InputGroup.Prefix>
-            <Input
-              placeholder="Search notes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </InputGroup>
-        </TextField>
+        <SearchField
+          fullWidth
+          aria-label="Search notes"
+          value={searchQuery}
+          onChange={setSearchQuery}
+          variant="secondary"
+        >
+          <SearchField.Group>
+            <SearchField.SearchIcon />
+            <SearchField.Input placeholder="Search notes..." />
+            <SearchField.ClearButton />
+          </SearchField.Group>
+        </SearchField>
       </div>
 
-      <div className="mb-4 flex items-center gap-2">
-        <CreateNoteButton />
-        <Button variant="tertiary" size="sm" onPress={openCreateCollection}>
-          <Icon icon={FolderAddIcon} className={sidebarIconClass} />
-          Collection
-        </Button>
+      <div className="mb-4">
+        <CreateNoteButton defaultFolderId={defaultFolderIdForNewNote} />
       </div>
+
+      {folders.length > 0 && (
+        <div className="mb-3 flex items-center gap-1 min-w-0">
+          <Button
+            isIconOnly
+            size="sm"
+            variant="secondary"
+            aria-label="Create collection"
+            className="shrink-0"
+            onPress={openCreateCollection}
+          >
+            <Icon icon={Add01Icon} size={16} />
+          </Button>
+
+          <div className="min-w-0 flex-1 overflow-x-auto no-scrollbar">
+            <Tabs
+              selectedKey={selectedCollectionId}
+              onSelectionChange={(key) => setSelectedCollectionId(String(key))}
+              variant="secondary"
+            >
+              <Tabs.ListContainer className="min-w-0">
+                <Tabs.List className="flex-nowrap">
+                  <Tabs.Tab id={ALL_COLLECTIONS_ID}>All</Tabs.Tab>
+                  {folders.map((folder) => (
+                    <Tabs.Tab key={folder.id} id={folder.id}>
+                      <span className="truncate max-w-[88px]">{folder.name}</span>
+                    </Tabs.Tab>
+                  ))}
+                  <Tabs.Indicator />
+                </Tabs.List>
+              </Tabs.ListContainer>
+            </Tabs>
+          </div>
+
+          {activeFolder && (
+            <Dropdown>
+              <Dropdown.Trigger>
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="ghost"
+                  aria-label="Collection options"
+                  className="shrink-0"
+                >
+                  <Icon icon={MoreVerticalIcon} size={16} className={sidebarIconClass} />
+                </Button>
+              </Dropdown.Trigger>
+              <Dropdown.Popover placement="bottom end">
+                <Dropdown.Menu
+                  aria-label="Collection actions"
+                  onAction={(key) => {
+                    if (key === "rename") openRenameCollection();
+                    if (key === "delete") handleDeleteCollection();
+                  }}
+                >
+                  <Dropdown.Item id="rename" textValue="Rename">
+                    <Icon icon={PencilEdit01Icon} className={sidebarIconClass} />
+                    <Label>Rename</Label>
+                  </Dropdown.Item>
+                  <Dropdown.Item id="delete" textValue="Delete collection" variant="danger">
+                    <Icon icon={Delete02Icon} className={sidebarIconClass} />
+                    <Label>Delete collection</Label>
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown.Popover>
+            </Dropdown>
+          )}
+        </div>
+      )}
+
+      {folders.length === 0 && (
+        <div className="mb-3">
+          <Button
+            isIconOnly
+            size="sm"
+            variant="secondary"
+            aria-label="Create collection"
+            onPress={openCreateCollection}
+          >
+            <Icon icon={Add01Icon} size={16} />
+          </Button>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto -mr-2 pr-2 text-sm">
-        {notes.length === 0 && folders.length === 0 ? (
+        {notes.length === 0 ? (
           <div className="text-center py-8 text-muted">
             <Icon icon={Note01Icon} size={48} className="mx-auto mb-2 opacity-50" />
             <p>No notes yet</p>
             <p className="text-muted mt-1">Click &quot;New Note&quot; to get started</p>
           </div>
+        ) : displayedNotes.length > 0 ? (
+          <div className="flex flex-col gap-0.5">{displayedNotes.map(noteRow)}</div>
+        ) : searchQuery ? (
+          <p className="text-center text-muted py-4">No notes found</p>
         ) : (
-          <div className="flex flex-col gap-1">
-            {folders.map((folder) => {
-              const folderNotes = filteredNotes.filter((n) => n.folderId === folder.id);
-              const isOpen = expanded[folder.id] ?? false;
-              return (
-                <div key={folder.id}>
-                  <div className="group flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-surface-secondary">
-                    <button
-                      className="flex items-center gap-1.5 flex-1 min-w-0 text-left text-sm"
-                      onClick={() => toggleFolder(folder.id)}
-                    >
-                      <Icon
-                        icon={isOpen ? ChevronDownIcon : ChevronRightIcon}
-                        className={sidebarIconClass}
-                      />
-                      <Icon icon={Folder01Icon} className={sidebarIconClass} />
-                      <span className="truncate">{folder.name}</span>
-                      <span className="text-muted shrink-0">{folderNotes.length}</span>
-                    </button>
-                    <Dropdown>
-                      <Dropdown.Trigger>
-                        <button className="p-1 hover:bg-surface-tertiary rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Icon icon={MoreVerticalIcon} className={sidebarIconClass} />
-                        </button>
-                      </Dropdown.Trigger>
-                      <Dropdown.Popover placement="bottom end">
-                        <Dropdown.Menu
-                          aria-label="Collection actions"
-                          onAction={(key) => {
-                            if (key === "rename") openRenameCollection(folder.id, folder.name);
-                            if (key === "delete") deleteFolder(folder.id);
-                          }}
-                        >
-                          <Dropdown.Item id="rename" textValue="Rename">
-                            <Icon icon={PencilEdit01Icon} className={sidebarIconClass} />
-                            <Label>Rename</Label>
-                          </Dropdown.Item>
-                          <Dropdown.Item id="delete" textValue="Delete collection" variant="danger">
-                            <Icon icon={Delete02Icon} className={sidebarIconClass} />
-                            <Label>Delete collection</Label>
-                          </Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown.Popover>
-                    </Dropdown>
-                  </div>
-
-                  {isOpen && (
-                    <div className="ml-4 flex flex-col gap-0.5 mt-0.5">
-                      {folderNotes.length > 0 ? (
-                        folderNotes.map(noteRow)
-                      ) : (
-                        <p className="text-muted px-3 py-1.5">Empty collection</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            {ungroupedNotes.length > 0 && (
-              <div className="mt-1 flex flex-col gap-0.5">
-                {folders.length > 0 && (
-                  <p className="text-muted px-2 pt-2 pb-1">Notes</p>
-                )}
-                {ungroupedNotes.map(noteRow)}
-              </div>
-            )}
-
-            {filteredNotes.length === 0 && searchQuery && (
-              <p className="text-center text-muted py-4">No notes found</p>
-            )}
-          </div>
+          <p className="text-center text-muted py-4">
+            {activeFolder ? "Empty collection" : "No notes in this view"}
+          </p>
         )}
       </div>
 
