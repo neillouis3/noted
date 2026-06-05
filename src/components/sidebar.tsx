@@ -185,7 +185,6 @@ export default function Sidebar() {
                       <span className="truncate max-w-[88px]">{folder.name}</span>
                     </Tabs.Tab>
                   ))}
-                  <Tabs.Indicator />
                 </Tabs.List>
               </Tabs.ListContainer>
             </Tabs>
