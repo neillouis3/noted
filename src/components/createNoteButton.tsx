@@ -11,7 +11,7 @@ import {
   TextField,
   useOverlayState,
 } from '@heroui/react';
-import { TaskAdd02Icon } from '@hugeicons/core-free-icons';
+import { PencilEdit02Icon } from '@hugeicons/core-free-icons';
 import Icon from '@/components/icon';
 import { useNotes } from '@/contexts/notesContext';
 
@@ -60,7 +60,7 @@ export default function CreateNoteButton({
             aria-label="Create note"
             size="sm"
           >
-            <Icon icon={TaskAdd02Icon} size={16} />
+            <Icon icon={PencilEdit02Icon} size={16} />
           </Button>
         );
       case 'fab':
@@ -71,14 +71,14 @@ export default function CreateNoteButton({
             className="fixed bottom-6 right-6 z-50 shadow-lg"
             size="sm"
           >
-            <Icon icon={TaskAdd02Icon} size={16} />
+            <Icon icon={PencilEdit02Icon} size={16} />
             New Note
           </Button>
         );
       default:
         return (
           <Button variant="primary" onPress={modalState.open} size="sm">
-            <Icon icon={TaskAdd02Icon} size={16} />
+            <Icon icon={PencilEdit02Icon} size={16} />
             New Note
           </Button>
         );

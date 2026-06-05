@@ -36,8 +36,14 @@ import {
   redoCommand,
 } from '@/handlers/editorFormatHandlers';
 import { InsertImageDialog } from './imagePlugin';
+import NotesActionsToolbar from '@/components/notesActionsToolbar';
+import type { NotesToolbarProps } from '@/types/editor.types';
 
-export default function ToolbarPlugin() {
+interface ToolbarPluginProps {
+  notesToolbarProps: NotesToolbarProps;
+}
+
+export default function ToolbarPlugin({ notesToolbarProps }: ToolbarPluginProps) {
   const {
     isBold,
     isItalic,
@@ -56,6 +62,8 @@ export default function ToolbarPlugin() {
   return (
     <>
       <div className="ml-80 mt-4 fixed top-0 left-0 z-10 flex max-w-[calc(100vw-22rem)] flex-wrap items-center gap-2">
+        <NotesActionsToolbar {...notesToolbarProps} />
+
         <Toolbar isAttached aria-label="History" className={toolbarClassName}>
           <ToolbarButton
             onClick={() => undoCommand(editor)}

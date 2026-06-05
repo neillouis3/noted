@@ -10,7 +10,7 @@ import { ThemeSwitcher } from "@/components/themeSwitch";
 const ALL_COLLECTIONS_ID = "all";
 
 function HomeContent() {
-  const { folders } = useNotes();
+  const { folders, selectedNoteId } = useNotes();
   const [selectedCollectionId, setSelectedCollectionId] = useState<string>(ALL_COLLECTIONS_ID);
 
   const activeFolder =
@@ -21,14 +21,18 @@ function HomeContent() {
   const defaultFolderIdForNewNote =
     activeFolder?.id ?? (selectedCollectionId === ALL_COLLECTIONS_ID ? null : selectedCollectionId);
 
+  const notesToolbarProps = {
+    selectedCollectionId,
+    defaultFolderIdForNewNote,
+  };
+
   return (
     <>
-      <div className="fixed top-4 left-4 z-20">
-        <NotesActionsToolbar
-          selectedCollectionId={selectedCollectionId}
-          defaultFolderIdForNewNote={defaultFolderIdForNewNote}
-        />
-      </div>
+      {!selectedNoteId && (
+        <div className="ml-80 mt-4 fixed top-0 left-0 z-10 flex max-w-[calc(100vw-22rem)] flex-wrap items-center gap-2">
+          <NotesActionsToolbar {...notesToolbarProps} />
+        </div>
+      )}
 
       <div className="w-72 h-full">
         <Sidebar
@@ -41,7 +45,7 @@ function HomeContent() {
         <div className="fixed top-0 right-0 z-10 mr-4 mt-4">
           <ThemeSwitcher />
         </div>
-        <EditorArea />
+        <EditorArea notesToolbarProps={notesToolbarProps} />
       </div>
     </>
   );

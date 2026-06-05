@@ -4,7 +4,7 @@ import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import type { EditorState } from 'lexical';
 import { useRef } from 'react';
-import type { EditorProps } from '@/types/editor.types';
+import type { EditorProps, NotesToolbarProps } from '@/types/editor.types';
 import { createEditorConfig } from './config/editorConfig';
 import ToolbarPlugin from './plugins/toolbarPlugin';
 import EditorPlugins from './plugins/editorPlugins';
@@ -16,6 +16,7 @@ export default function LexicalTextarea({
   onChange,
   autoFocus = false,
   className = '',
+  notesToolbarProps,
 }: EditorProps) {
   const initialConfig = createEditorConfig(initialContent);
   // Skip the very first onChange that fires when the editor mounts, so opening
@@ -33,7 +34,7 @@ export default function LexicalTextarea({
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <div className={`flex flex-col gap-2  w-full h-screen overflow-auto ${className}`}>
-        <ToolbarPlugin />
+        <ToolbarPlugin notesToolbarProps={notesToolbarProps} />
         <EditorContent placeholder={placeholder} />
         <EditorPlugins autoFocus={autoFocus} />
         {onChange && (

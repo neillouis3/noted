@@ -116,7 +116,7 @@ export default function Sidebar({
   );
 
   return (
-    <div className="attached-surface w-72 text-foreground flex flex-col h-[calc(100vh-6.5rem)] p-4 fixed top-14 left-0 z-10 ml-4">
+    <div className="attached-surface w-72 text-foreground flex flex-col h-[calc(100vh-2rem)] p-4 fixed top-0 left-0 z-10 ml-4 mt-4">
       <div className="mb-4">
         <SearchField
           fullWidth

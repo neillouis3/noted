@@ -5,8 +5,13 @@ import { Note01Icon } from '@hugeicons/core-free-icons';
 import Icon from '@/components/icon';
 import LexicalTextarea from '@/components/textarea/editor';
 import { useNotes } from '@/contexts/notesContext';
+import type { NotesToolbarProps } from '@/types/editor.types';
 
-export default function EditorArea() {
+interface EditorAreaProps {
+  notesToolbarProps: NotesToolbarProps;
+}
+
+export default function EditorArea({ notesToolbarProps }: EditorAreaProps) {
   const { getSelectedNote, updateNote } = useNotes();
   const note = getSelectedNote();
 
@@ -34,6 +39,7 @@ export default function EditorArea() {
       key={note.id}
       initialContent={note.content}
       onChange={handleChange}
+      notesToolbarProps={notesToolbarProps}
       autoFocus
     />
   );

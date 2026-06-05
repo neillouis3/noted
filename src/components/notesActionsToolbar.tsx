@@ -91,8 +91,6 @@ export default function NotesActionsToolbar({
   return (
     <>
       <Toolbar isAttached aria-label="Note actions" className={toolbarClassName}>
-        <CreateNoteButton variant="icon" defaultFolderId={defaultFolderIdForNewNote} />
-
         <Dropdown>
           <Dropdown.Trigger>
             <Button
@@ -126,6 +124,8 @@ export default function NotesActionsToolbar({
             </Dropdown.Menu>
           </Dropdown.Popover>
         </Dropdown>
+
+        <CreateNoteButton variant="icon" defaultFolderId={defaultFolderIdForNewNote} />
       </Toolbar>
 
       <Modal state={noteRenameModal}>

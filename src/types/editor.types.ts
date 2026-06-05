@@ -4,7 +4,13 @@ export interface EditorProps {
     onChange?: (content: string) => void;
     autoFocus?: boolean;
     className?: string;
+    notesToolbarProps: NotesToolbarProps;
   }
+
+export interface NotesToolbarProps {
+  selectedCollectionId: string;
+  defaultFolderIdForNewNote: string | null;
+}
   
 import type { IconSvgElement } from '@hugeicons/react';
 
