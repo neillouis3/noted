@@ -28,19 +28,31 @@ class AutocompleteOption extends MenuOption {
 }
 
 function mathTriggerFn(text: string): MenuTextMatch | null {
-  const match = /(?:^|[\s])(=\s*[\d+\-*/().\s]+)$/.exec(text);
-  if (!match) {
-    return null;
+  // Suffix equals: "1+1="
+  const suffixMatch = /(?:^|[\s])([\d+\-*/().\s]+=)$/.exec(text);
+  if (suffixMatch) {
+    const matchingString = suffixMatch[1];
+    const leadOffset = suffixMatch.index + (suffixMatch[0].length - matchingString.length);
+    return { leadOffset, matchingString, replaceableString: matchingString };
   }
 
-  const matchingString = match[1];
-  const leadOffset = match.index + (match[0].length - matchingString.length);
+  // Prefix equals: "=1+1"
+  const prefixMatch = /(?:^|[\s])(=\s*[\d+\-*/().\s]+)$/.exec(text);
+  if (prefixMatch) {
+    const matchingString = prefixMatch[1];
+    const leadOffset = prefixMatch.index + (prefixMatch[0].length - matchingString.length);
+    return { leadOffset, matchingString, replaceableString: matchingString };
+  }
 
-  return {
-    leadOffset,
-    matchingString,
-    replaceableString: matchingString,
-  };
+  return null;
+}
+
+function extractMathExpression(matchingString: string): string | null {
+  const expression = matchingString
+    .replace(/^=\s*/, '')
+    .replace(/=\s*$/, '')
+    .trim();
+  return expression || null;
 }
 
 function replaceMatchingText(
@@ -244,7 +256,7 @@ export default function AutocompletePlugin() {
       <LexicalTypeaheadMenuPlugin
         triggerFn={mathTriggerFn}
         options={mathOptions}
-        onQueryChange={(match) => setMathQuery(match ? match.replace(/^=\s*/, '') : null)}
+        onQueryChange={(match) => setMathQuery(match ? extractMathExpression(match) : null)}
         onSelectOption={onSelectMathOption}
         menuRenderFn={renderMenu}
       />

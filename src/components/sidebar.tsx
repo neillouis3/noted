@@ -106,11 +106,6 @@ export default function Sidebar() {
 
   return (
     <div className="w-72 bg-background text-foreground flex flex-col h-[calc(100vh-2rem)] border border-border rounded-lg p-4 fixed top-0 left-0 z-10 ml-4 mt-4">
-      <div className="flex flex-row gap-4 items-center mb-4">
-        <img src="/logo.png" alt="Noted" width={48} height={48} className="rounded-lg" />
-        <h1 className="text-sm font-semibold">Noted</h1>
-      </div>
-
       <div className="mb-4">
         <TextField className="w-full">
           <InputGroup>
