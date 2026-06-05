@@ -35,6 +35,12 @@ body {
 
 
 
+@layer components {
+  .attached-surface {
+    @apply rounded-3xl bg-surface shadow-overlay backdrop-blur-lg;
+  }
+}
+
 @layer utilities {
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {

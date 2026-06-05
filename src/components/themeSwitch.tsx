@@ -18,7 +18,7 @@ export function ThemeSwitcher() {
   const isDark = theme === "dark";
 
   return (
-    <div className="text-foreground border border-border rounded-lg p-1 z-10 backdrop-blur-lg">
+    <div className="attached-surface text-foreground p-1 z-10">
       <Switch
         isSelected={isDark}
         onChange={(selected) => setTheme(selected ? "dark" : "light")}
