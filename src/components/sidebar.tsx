@@ -27,13 +27,20 @@ import {
 import { useNotes } from "@/contexts/notesContext";
 import type { Note } from "@/types/notes.types";
 import { downloadNoteAsTxt, printNote } from "@/utils/noteExport";
-import CreateNoteButton from "./createNoteButton";
 import Icon from "./icon";
 
 const sidebarIconClass = "shrink-0 text-muted";
 const ALL_COLLECTIONS_ID = "all";
 
-export default function Sidebar() {
+interface SidebarProps {
+  selectedCollectionId: string;
+  onSelectedCollectionChange: (collectionId: string) => void;
+}
+
+export default function Sidebar({
+  selectedCollectionId,
+  onSelectedCollectionChange,
+}: SidebarProps) {
   const {
     notes,
     folders,
@@ -45,7 +52,6 @@ export default function Sidebar() {
   } = useNotes();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCollectionId, setSelectedCollectionId] = useState<string>(ALL_COLLECTIONS_ID);
   const collectionModal = useOverlayState();
   const [collectionName, setCollectionName] = useState("");
 
@@ -61,7 +67,7 @@ export default function Sidebar() {
     }
 
     if (selectedCollectionId === ALL_COLLECTIONS_ID) {
-      return filteredNotes.filter((note) => note.folderId === null);
+      return filteredNotes;
     }
 
     return filteredNotes.filter((note) => note.folderId === selectedCollectionId);
@@ -72,17 +78,14 @@ export default function Sidebar() {
       ? folders.find((folder) => folder.id === selectedCollectionId) ?? null
       : null;
 
-  const defaultFolderIdForNewNote =
-    activeFolder?.id ?? (selectedCollectionId === ALL_COLLECTIONS_ID ? null : selectedCollectionId);
-
   useEffect(() => {
     if (
       selectedCollectionId !== ALL_COLLECTIONS_ID &&
       !folders.some((folder) => folder.id === selectedCollectionId)
     ) {
-      setSelectedCollectionId(ALL_COLLECTIONS_ID);
+      onSelectedCollectionChange(ALL_COLLECTIONS_ID);
     }
-  }, [folders, selectedCollectionId]);
+  }, [folders, onSelectedCollectionChange, selectedCollectionId]);
 
   const openCreateCollection = () => {
     setCollectionName("");
@@ -93,7 +96,7 @@ export default function Sidebar() {
     if (!collectionName.trim()) return;
 
     const folder = createFolder(collectionName);
-    setSelectedCollectionId(folder.id);
+    onSelectedCollectionChange(folder.id);
     setCollectionName("");
     collectionModal.close();
   };
@@ -113,7 +116,7 @@ export default function Sidebar() {
   );
 
   return (
-    <div className="attached-surface w-72 text-foreground flex flex-col h-[calc(100vh-2rem)] p-4 fixed top-0 left-0 z-10 ml-4 mt-4">
+    <div className="attached-surface w-72 text-foreground flex flex-col h-[calc(100vh-6.5rem)] p-4 fixed top-14 left-0 z-10 ml-4">
       <div className="mb-4">
         <SearchField
           fullWidth
@@ -131,50 +134,42 @@ export default function Sidebar() {
       </div>
 
       <div className="mb-3">
-        <CreateNoteButton defaultFolderId={defaultFolderIdForNewNote} />
-
-        <div
-          className={`mt-3 flex items-center gap-1 min-w-0 ${folders.length === 0 ? "justify-end" : ""}`}
+        <Tabs
+          selectedKey={selectedCollectionId}
+          onSelectionChange={(key) => onSelectedCollectionChange(String(key))}
+          className="min-w-0"
         >
-          {folders.length > 0 && (
+          <Tabs.ListContainer className="flex min-w-0 items-center gap-1 bg-transparent">
             <div className="min-w-0 flex-1 overflow-x-auto no-scrollbar">
-              <Tabs
-                selectedKey={selectedCollectionId}
-                onSelectionChange={(key) => setSelectedCollectionId(String(key))}
-                className="min-w-0"
+              <Tabs.List
+                aria-label="Collections"
+                className="w-fit flex-nowrap bg-transparent p-0 *:h-6 *:w-fit *:px-3 *:text-sm *:font-normal *:data-[selected=true]:text-accent-foreground"
               >
-                <Tabs.ListContainer className="min-w-0 bg-transparent">
-                  <Tabs.List
-                    aria-label="Collections"
-                    className="w-fit flex-nowrap bg-transparent p-0 *:h-6 *:w-fit *:px-3 *:text-sm *:font-normal *:data-[selected=true]:text-accent-foreground"
-                  >
-                    <Tabs.Tab id={ALL_COLLECTIONS_ID}>
-                      All
-                      <Tabs.Indicator className="bg-accent" />
-                    </Tabs.Tab>
-                    {folders.map((folder) => (
-                      <Tabs.Tab key={folder.id} id={folder.id}>
-                        <span className="truncate max-w-[88px]">{folder.name}</span>
-                        <Tabs.Indicator className="bg-accent" />
-                      </Tabs.Tab>
-                    ))}
-                  </Tabs.List>
-                </Tabs.ListContainer>
-              </Tabs>
+                <Tabs.Tab id={ALL_COLLECTIONS_ID}>
+                  All
+                  <Tabs.Indicator className="bg-accent" />
+                </Tabs.Tab>
+                {folders.map((folder) => (
+                  <Tabs.Tab key={folder.id} id={folder.id}>
+                    <span className="truncate max-w-[88px]">{folder.name}</span>
+                    <Tabs.Indicator className="bg-accent" />
+                  </Tabs.Tab>
+                ))}
+              </Tabs.List>
             </div>
-          )}
 
-          <Button
-            isIconOnly
-            size="sm"
-            variant="secondary"
-            aria-label="Create collection"
-            className="shrink-0"
-            onPress={openCreateCollection}
-          >
-            <Icon icon={Add01Icon} size={16} />
-          </Button>
-        </div>
+            <Button
+              isIconOnly
+              size="sm"
+              variant="secondary"
+              aria-label="Create collection"
+              className="shrink-0"
+              onPress={openCreateCollection}
+            >
+              <Icon icon={Add01Icon} size={16} />
+            </Button>
+          </Tabs.ListContainer>
+        </Tabs>
       </div>
 
       <div className="flex-1 overflow-y-auto -mr-2 pr-2 text-sm">
