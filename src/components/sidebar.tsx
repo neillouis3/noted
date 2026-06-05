@@ -158,87 +158,82 @@ export default function Sidebar() {
         <CreateNoteButton defaultFolderId={defaultFolderIdForNewNote} />
       </div>
 
-      {folders.length > 0 && (
-        <div className="mb-3 flex items-center gap-1 min-w-0">
-          <Button
-            isIconOnly
-            size="sm"
-            variant="secondary"
-            aria-label="Create collection"
-            className="shrink-0"
-            onPress={openCreateCollection}
-          >
-            <Icon icon={Add01Icon} size={16} />
-          </Button>
-
+      <div
+        className={`mb-3 flex items-center gap-1 min-w-0 ${folders.length === 0 ? "justify-end" : ""}`}
+      >
+        {folders.length > 0 && (
           <div className="min-w-0 flex-1 overflow-x-auto no-scrollbar">
             <Tabs
               selectedKey={selectedCollectionId}
               onSelectionChange={(key) => setSelectedCollectionId(String(key))}
-              variant="secondary"
+              className="min-w-0"
             >
-              <Tabs.ListContainer className="min-w-0">
-                <Tabs.List className="flex-nowrap">
-                  <Tabs.Tab id={ALL_COLLECTIONS_ID}>All</Tabs.Tab>
+              <Tabs.ListContainer className="min-w-0 bg-transparent">
+                <Tabs.List
+                  aria-label="Collections"
+                  className="w-fit flex-nowrap bg-transparent p-0 *:h-6 *:w-fit *:px-3 *:text-sm *:font-normal *:data-[selected=true]:text-accent-foreground"
+                >
+                  <Tabs.Tab id={ALL_COLLECTIONS_ID}>
+                    All
+                    <Tabs.Indicator className="bg-accent" />
+                  </Tabs.Tab>
                   {folders.map((folder) => (
                     <Tabs.Tab key={folder.id} id={folder.id}>
                       <span className="truncate max-w-[88px]">{folder.name}</span>
+                      <Tabs.Indicator className="bg-accent" />
                     </Tabs.Tab>
                   ))}
                 </Tabs.List>
               </Tabs.ListContainer>
             </Tabs>
           </div>
+        )}
 
-          {activeFolder && (
-            <Dropdown>
-              <Dropdown.Trigger>
-                <Button
-                  isIconOnly
-                  size="sm"
-                  variant="ghost"
-                  aria-label="Collection options"
-                  className="shrink-0"
-                >
-                  <Icon icon={MoreVerticalIcon} size={16} className={sidebarIconClass} />
-                </Button>
-              </Dropdown.Trigger>
-              <Dropdown.Popover placement="bottom end">
-                <Dropdown.Menu
-                  aria-label="Collection actions"
-                  onAction={(key) => {
-                    if (key === "rename") openRenameCollection();
-                    if (key === "delete") handleDeleteCollection();
-                  }}
-                >
-                  <Dropdown.Item id="rename" textValue="Rename">
-                    <Icon icon={PencilEdit01Icon} className={sidebarIconClass} />
-                    <Label>Rename</Label>
-                  </Dropdown.Item>
-                  <Dropdown.Item id="delete" textValue="Delete collection" variant="danger">
-                    <Icon icon={Delete02Icon} className={sidebarIconClass} />
-                    <Label>Delete collection</Label>
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown.Popover>
-            </Dropdown>
-          )}
-        </div>
-      )}
+        <Button
+          isIconOnly
+          size="sm"
+          variant="secondary"
+          aria-label="Create collection"
+          className="shrink-0"
+          onPress={openCreateCollection}
+        >
+          <Icon icon={Add01Icon} size={16} />
+        </Button>
 
-      {folders.length === 0 && (
-        <div className="mb-3">
-          <Button
-            isIconOnly
-            size="sm"
-            variant="secondary"
-            aria-label="Create collection"
-            onPress={openCreateCollection}
-          >
-            <Icon icon={Add01Icon} size={16} />
-          </Button>
-        </div>
-      )}
+        {activeFolder && (
+          <Dropdown>
+            <Dropdown.Trigger>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="ghost"
+                aria-label="Collection options"
+                className="shrink-0"
+              >
+                <Icon icon={MoreVerticalIcon} size={16} className={sidebarIconClass} />
+              </Button>
+            </Dropdown.Trigger>
+            <Dropdown.Popover placement="bottom end">
+              <Dropdown.Menu
+                aria-label="Collection actions"
+                onAction={(key) => {
+                  if (key === "rename") openRenameCollection();
+                  if (key === "delete") handleDeleteCollection();
+                }}
+              >
+                <Dropdown.Item id="rename" textValue="Rename">
+                  <Icon icon={PencilEdit01Icon} className={sidebarIconClass} />
+                  <Label>Rename</Label>
+                </Dropdown.Item>
+                <Dropdown.Item id="delete" textValue="Delete collection" variant="danger">
+                  <Icon icon={Delete02Icon} className={sidebarIconClass} />
+                  <Label>Delete collection</Label>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown.Popover>
+          </Dropdown>
+        )}
+      </div>
 
       <div className="flex-1 overflow-y-auto -mr-2 pr-2 text-sm">
         {notes.length === 0 ? (
