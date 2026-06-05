@@ -131,51 +131,49 @@ export default function Sidebar() {
       </div>
 
       <div className="mb-3">
+        <CreateNoteButton defaultFolderId={defaultFolderIdForNewNote} />
+
         <div
-          className={`flex items-center gap-1 min-w-0 ${folders.length === 0 ? "justify-end" : ""}`}
+          className={`mt-3 flex items-center gap-1 min-w-0 ${folders.length === 0 ? "justify-end" : ""}`}
         >
-        {folders.length > 0 && (
-          <div className="min-w-0 flex-1 overflow-x-auto no-scrollbar">
-            <Tabs
-              selectedKey={selectedCollectionId}
-              onSelectionChange={(key) => setSelectedCollectionId(String(key))}
-              className="min-w-0"
-            >
-              <Tabs.ListContainer className="min-w-0 bg-transparent">
-                <Tabs.List
-                  aria-label="Collections"
-                  className="w-fit flex-nowrap bg-transparent p-0 *:h-6 *:w-fit *:px-3 *:text-sm *:font-normal *:data-[selected=true]:text-accent-foreground"
-                >
-                  <Tabs.Tab id={ALL_COLLECTIONS_ID}>
-                    All
-                    <Tabs.Indicator className="bg-accent" />
-                  </Tabs.Tab>
-                  {folders.map((folder) => (
-                    <Tabs.Tab key={folder.id} id={folder.id}>
-                      <span className="truncate max-w-[88px]">{folder.name}</span>
+          {folders.length > 0 && (
+            <div className="min-w-0 flex-1 overflow-x-auto no-scrollbar">
+              <Tabs
+                selectedKey={selectedCollectionId}
+                onSelectionChange={(key) => setSelectedCollectionId(String(key))}
+                className="min-w-0"
+              >
+                <Tabs.ListContainer className="min-w-0 bg-transparent">
+                  <Tabs.List
+                    aria-label="Collections"
+                    className="w-fit flex-nowrap bg-transparent p-0 *:h-6 *:w-fit *:px-3 *:text-sm *:font-normal *:data-[selected=true]:text-accent-foreground"
+                  >
+                    <Tabs.Tab id={ALL_COLLECTIONS_ID}>
+                      All
                       <Tabs.Indicator className="bg-accent" />
                     </Tabs.Tab>
-                  ))}
-                </Tabs.List>
-              </Tabs.ListContainer>
-            </Tabs>
-          </div>
-        )}
+                    {folders.map((folder) => (
+                      <Tabs.Tab key={folder.id} id={folder.id}>
+                        <span className="truncate max-w-[88px]">{folder.name}</span>
+                        <Tabs.Indicator className="bg-accent" />
+                      </Tabs.Tab>
+                    ))}
+                  </Tabs.List>
+                </Tabs.ListContainer>
+              </Tabs>
+            </div>
+          )}
 
-        <Button
-          isIconOnly
-          size="sm"
-          variant="secondary"
-          aria-label="Create collection"
-          className="shrink-0"
-          onPress={openCreateCollection}
-        >
-          <Icon icon={Add01Icon} size={16} />
-        </Button>
-        </div>
-
-        <div className="mt-3">
-          <CreateNoteButton defaultFolderId={defaultFolderIdForNewNote} />
+          <Button
+            isIconOnly
+            size="sm"
+            variant="secondary"
+            aria-label="Create collection"
+            className="shrink-0"
+            onPress={openCreateCollection}
+          >
+            <Icon icon={Add01Icon} size={16} />
+          </Button>
         </div>
       </div>
 
