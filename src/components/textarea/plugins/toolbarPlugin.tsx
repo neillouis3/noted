@@ -21,8 +21,8 @@ import {
   Image01Icon,
 } from '@hugeicons/core-free-icons';
 import { useState } from 'react';
+import { Separator, Toolbar } from '@heroui/react';
 import ToolbarButton from '../ui/toolbarButton';
-import ToolbarDivider from '../ui/toolbarDivider';
 import HighlightColorPicker from '../ui/highlighterColorPicker';
 import { useToolbarState } from '@/hooks/useToolbarState';
 import {
@@ -53,7 +53,11 @@ export default function ToolbarPlugin() {
 
   return (
     <>
-      <div className=" backdrop-blur-lg flex flex-wrap items-center gap-1 border border-default-200 w-fit p-1 rounded-lg ml-80 mt-4 fixed top-0 left-0 z-10">
+      <Toolbar
+        isAttached
+        aria-label="Editor formatting"
+        className="ml-80 mt-4 fixed top-0 left-0 z-10 max-w-[calc(100vw-22rem)] backdrop-blur-lg flex-wrap"
+      >
         <ToolbarButton
           onClick={() => undoCommand(editor)}
           icon={UndoIcon}
@@ -65,7 +69,7 @@ export default function ToolbarPlugin() {
           label="Redo"
         />
 
-        <ToolbarDivider />
+        <Separator orientation="vertical" />
 
         <ToolbarButton
           onClick={() => formatText(editor, 'bold')}
@@ -97,10 +101,10 @@ export default function ToolbarPlugin() {
           icon={SourceCodeIcon}
           label="Code"
         />
-        
+
         <HighlightColorPicker editor={editor} isActive={isHighlight} />
 
-        <ToolbarDivider />
+        <Separator orientation="vertical" />
 
         <ToolbarButton
           onClick={() => formatHeading(editor, 'h1', blockType)}
@@ -121,7 +125,7 @@ export default function ToolbarPlugin() {
           label="Heading 3"
         />
 
-        <ToolbarDivider />
+        <Separator orientation="vertical" />
 
         <ToolbarButton
           onClick={() => formatBulletList(editor, blockType)}
@@ -142,7 +146,7 @@ export default function ToolbarPlugin() {
           label="Quote"
         />
 
-        <ToolbarDivider />
+        <Separator orientation="vertical" />
 
         <ToolbarButton
           onClick={() => setShowImageDialog(true)}
@@ -150,7 +154,7 @@ export default function ToolbarPlugin() {
           label="Insert Image"
         />
 
-        <ToolbarDivider />
+        <Separator orientation="vertical" />
 
         <ToolbarButton
           onClick={() => formatAlignment(editor, 'left')}
@@ -172,7 +176,7 @@ export default function ToolbarPlugin() {
           icon={TextAlignJustifyCenterIcon}
           label="Align Justify"
         />
-      </div>
+      </Toolbar>
 
       {showImageDialog && (
         <InsertImageDialog

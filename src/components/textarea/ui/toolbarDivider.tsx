@@ -1,5 +1,7 @@
 'use client';
 
+import { Separator } from '@heroui/react';
+
 export default function ToolbarDivider() {
-  return <div className="w-px h-6 bg-default-200" />;
+  return <Separator orientation="vertical" />;
 }
