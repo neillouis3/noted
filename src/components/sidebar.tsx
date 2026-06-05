@@ -23,7 +23,6 @@ import {
   Download01Icon,
   PrinterIcon,
   Delete02Icon,
-  PencilEdit01Icon,
 } from "@hugeicons/core-free-icons";
 import { useNotes } from "@/contexts/notesContext";
 import type { Note } from "@/types/notes.types";
@@ -43,15 +42,12 @@ export default function Sidebar() {
     deleteNote,
     moveNoteToFolder,
     createFolder,
-    renameFolder,
-    deleteFolder,
   } = useNotes();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCollectionId, setSelectedCollectionId] = useState<string>(ALL_COLLECTIONS_ID);
   const collectionModal = useOverlayState();
   const [collectionName, setCollectionName] = useState("");
-  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
 
   const query = searchQuery.toLowerCase();
   const filteredNotes = useMemo(
@@ -89,37 +85,17 @@ export default function Sidebar() {
   }, [folders, selectedCollectionId]);
 
   const openCreateCollection = () => {
-    setEditingFolderId(null);
     setCollectionName("");
-    collectionModal.open();
-  };
-
-  const openRenameCollection = () => {
-    if (!activeFolder) return;
-    setEditingFolderId(activeFolder.id);
-    setCollectionName(activeFolder.name);
     collectionModal.open();
   };
 
   const handleCollectionSubmit = () => {
     if (!collectionName.trim()) return;
 
-    if (editingFolderId) {
-      renameFolder(editingFolderId, collectionName);
-    } else {
-      const folder = createFolder(collectionName);
-      setSelectedCollectionId(folder.id);
-    }
-
+    const folder = createFolder(collectionName);
+    setSelectedCollectionId(folder.id);
     setCollectionName("");
-    setEditingFolderId(null);
     collectionModal.close();
-  };
-
-  const handleDeleteCollection = () => {
-    if (!activeFolder) return;
-    deleteFolder(activeFolder.id);
-    setSelectedCollectionId(ALL_COLLECTIONS_ID);
   };
 
   const noteRow = (note: Note) => (
@@ -154,13 +130,10 @@ export default function Sidebar() {
         </SearchField>
       </div>
 
-      <div className="mb-4">
-        <CreateNoteButton defaultFolderId={defaultFolderIdForNewNote} />
-      </div>
-
-      <div
-        className={`mb-3 flex items-center gap-1 min-w-0 ${folders.length === 0 ? "justify-end" : ""}`}
-      >
+      <div className="mb-3">
+        <div
+          className={`flex items-center gap-1 min-w-0 ${folders.length === 0 ? "justify-end" : ""}`}
+        >
         {folders.length > 0 && (
           <div className="min-w-0 flex-1 overflow-x-auto no-scrollbar">
             <Tabs
@@ -199,40 +172,11 @@ export default function Sidebar() {
         >
           <Icon icon={Add01Icon} size={16} />
         </Button>
+        </div>
 
-        {activeFolder && (
-          <Dropdown>
-            <Dropdown.Trigger>
-              <Button
-                isIconOnly
-                size="sm"
-                variant="ghost"
-                aria-label="Collection options"
-                className="shrink-0"
-              >
-                <Icon icon={MoreVerticalIcon} size={16} className={sidebarIconClass} />
-              </Button>
-            </Dropdown.Trigger>
-            <Dropdown.Popover placement="bottom end">
-              <Dropdown.Menu
-                aria-label="Collection actions"
-                onAction={(key) => {
-                  if (key === "rename") openRenameCollection();
-                  if (key === "delete") handleDeleteCollection();
-                }}
-              >
-                <Dropdown.Item id="rename" textValue="Rename">
-                  <Icon icon={PencilEdit01Icon} className={sidebarIconClass} />
-                  <Label>Rename</Label>
-                </Dropdown.Item>
-                <Dropdown.Item id="delete" textValue="Delete collection" variant="danger">
-                  <Icon icon={Delete02Icon} className={sidebarIconClass} />
-                  <Label>Delete collection</Label>
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown.Popover>
-          </Dropdown>
-        )}
+        <div className="mt-3">
+          <CreateNoteButton defaultFolderId={defaultFolderIdForNewNote} />
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto -mr-2 pr-2 text-sm">
@@ -261,9 +205,7 @@ export default function Sidebar() {
           <Modal.Container>
             <Modal.Dialog className="sm:max-w-md">
               <Modal.Header>
-                <Modal.Heading className="text-md font-normal">
-                  {editingFolderId ? "Rename Collection" : "New Collection"}
-                </Modal.Heading>
+                <Modal.Heading className="text-md font-normal">New Collection</Modal.Heading>
               </Modal.Header>
               <Modal.Body>
                 <TextField className="w-full">
@@ -289,7 +231,7 @@ export default function Sidebar() {
                   onPress={handleCollectionSubmit}
                   isDisabled={!collectionName.trim()}
                 >
-                  {editingFolderId ? "Save" : "Create"}
+                  Create
                 </Button>
               </Modal.Footer>
             </Modal.Dialog>
